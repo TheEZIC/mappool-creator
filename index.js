@@ -13,7 +13,6 @@ var pool = new Parser(fs.readFileSync("./maps.txt").toString()).getPool();
         mp.addHeader(group.name);
         for(let map of group.maps) {
             let m = await API.getMap(map, group.mods);
-            //console.log(m.id);
             await m.saveBG(`${m.id}.jpg`);
             mp.addMap(m, `${m.id}.jpg`);
         }

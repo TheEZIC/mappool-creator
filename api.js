@@ -9,13 +9,17 @@ class osuAPI {
         this.api = axios.create({
             validateStatus: () => true,
             baseURL: "https://osu.ppy.sh/api",
-            timeout: 1e4 // = 10000
+            timeout: 1e4 
         });
     }
 
     async getMap(id, mods = 0) {
-        let { data } = await this.api.get(`/get_beatmaps?${qs.stringify({ k: this.token, b: id, mods: mods & 338 })}`);
-        return new osuMap(data[0]);
+        let { data } = await this.api.get(`/get_beatmaps?${qs.stringify({ k: this.token, 
+            b: id, 
+            mods: mods & 338 
+        })}`);
+        //console.log(data[0]);
+        return new osuMap(data[0], mods);
     }
 }
 

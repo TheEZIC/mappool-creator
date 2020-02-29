@@ -12,12 +12,7 @@ class MapPool {
         this.n = 0;
         // Create new excel document with 'Map pool' list
         this.book = new xl.Workbook();
-        this.list = this.book.addWorksheet('Map pool', {
-            'sheetFormat': {
-                'defaultRowHeight': 35
-            },
-            'disableRowSpansOptimization': false
-        });
+        this.list = this.book.addWorksheet('Map pool', {'sheetFormat': {'defaultRowHeight': 35}});
 
         // Medium bordered cell
         this.cellStyle = {
@@ -43,8 +38,9 @@ class MapPool {
         this.list.column(3).setWidth(70); // Title
         this.list.column(4).setWidth(37); // Link
         this.list.column(5).setWidth(7); // Length
-        this.list.column(6).setWidth(7); // Star rating
-        this.list.column(7).setWidth(20); // Stats (AR, CS, OD, HP)
+        this.list.column(6).setWidth(7); //bpm
+        this.list.column(7).setWidth(7); // Star rating
+        this.list.column(8).setWidth(30); // Stats (AR, CS, OD, HP)
 
         // Set properties in the first row
         this.setText('№', 1, 1, this.cellStyle);
@@ -52,8 +48,9 @@ class MapPool {
         this.setText('Title', 1, 3, this.cellStyle);
         this.setText('Link', 1, 4, this.cellStyle);
         this.setText('Length', 1, 5, this.cellStyle);
-        this.setText('Star rating', 1, 6, this.cellStyle);
-        this.setText('Stats', 1, 7, this.cellStyle);
+        this.setText('BPM', 1, 6, this.cellStyle);
+        this.setText('Star rating', 1, 7, this.cellStyle);
+        this.setText('Stats', 1, 8, this.cellStyle);
     }
     
     addHeader(name) {
@@ -64,15 +61,17 @@ class MapPool {
 
     /**
      * @param {osuMap} map
+     * @param {bf} bg src
      */
     addMap(map, bg) {
         this.setNumber(++this.n, this.row, 1, this.cellStyle);
         this.setImage(bg, this.row, 2, this.cellStyle);
         this.setText(`${map.artist} - ${map.title} [${map.diffName}]`, this.row, 3, this.cellStyle);
         this.setHyperLink(`https://osu.ppy.sh/b/${map.id}`, this.row, 4, this.cellStyle);
-        this.setText(`Length`, this.row, 5, this.cellStyle),
-        this.setText(`${map.stars.toFixed(2)}*`, this.row, 6, this.cellStyle);
-        this.setText(map.stats.toString(), this.row, 7, this.cellStyle);
+        this.setText(`${map.length}`, this.row, 5, this.cellStyle),
+        this.setText(`${map.bpm}`, this.row, 6, this.cellStyle);
+        this.setText(`${map.stars.toFixed(2)}*`, this.row, 7, this.cellStyle);
+        this.setText(map.stats.toString(), this.row, 8, this.cellStyle);
         this.row++;
     }
 
