@@ -1,4 +1,5 @@
 /node_modules
 package-lock.json
-*.jpg
+[0-9]*.jpg
+maps.txt
 *.xlsx
