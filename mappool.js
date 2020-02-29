@@ -1,6 +1,7 @@
-let xl = require('excel4node');
+let xl = require('exceljs');
 let osuMap = require('./map');
 const { border } = require('./util');
+let fs = require('fs');
 
 class MapPool {
     constructor() {
@@ -12,20 +13,20 @@ class MapPool {
         this.n = 0;
         // Create new excel document with 'Map pool' list
         this.book = new xl.Workbook();
-        this.list = this.book.addWorksheet('Map pool', {'sheetFormat': {'defaultRowHeight': 35}});
-
-        // Medium bordered cell
+        this.list = this.book.addWorksheet('Map pool', {properties:{defaultRowHeight: 35}}     /* {'sheetFormat': {'defaultRowHeight': 35}} */);
+        /* this.bookStream = createAndFillWorkbook(); */
+        this.list.state = 'visible';
+        // Medium bordered cell style
         this.cellStyle = {
             alignment: {
-                horizontal: 'center',
-                vertical: 'center',
-                wrapText: true
-            },
+                vertical: 'middle', 
+                horizontal: 'center'
+            }, 
             border: {
-                left: border,
-                right: border,
-                top: border,
-                bottom: border
+                top: {style: 'medium'}, 
+                bottom: {style: 'medium'}, 
+                left: {style: 'medium'}, 
+                right: {style: 'medium'}
             }
         };
 
@@ -33,90 +34,93 @@ class MapPool {
     }
 
     init() {
-        this.list.column(1).setWidth(5); // №
-        this.list.column(2).setWidth(20); // Background
-        this.list.column(3).setWidth(70); // Title
-        this.list.column(4).setWidth(37); // Link
-        this.list.column(5).setWidth(7); // Length
-        this.list.column(6).setWidth(7); //bpm
-        this.list.column(7).setWidth(7); // Star rating
-        this.list.column(8).setWidth(30); // Stats (AR, CS, OD, HP)
+        //Create sheet header
+        this.list.columns = [
+            {header: '№', width: 6},
+            {header: 'Background', width: 20},
+            {header: 'Title', width: 90},
+            {header: 'Link', width: 37},
+            {header: 'LEN', width: 7},
+            {header: 'BPM', width: 7},
+            {header: 'SR', width: 7},
+            {header: 'Stats', width: 30}
+        ]
 
-        // Set properties in the first row
-        this.setText('№', 1, 1, this.cellStyle);
-        this.setText('Background', 1, 2, this.cellStyle);
-        this.setText('Title', 1, 3, this.cellStyle);
-        this.setText('Link', 1, 4, this.cellStyle);
-        this.setText('Length', 1, 5, this.cellStyle);
-        this.setText('BPM', 1, 6, this.cellStyle);
-        this.setText('Star rating', 1, 7, this.cellStyle);
-        this.setText('Stats', 1, 8, this.cellStyle);
+        //Style for sheet header
+        for(let i = 1; i < 9; i++) {
+            this.list.getRow(1).getCell(i).style = Object.assign({}, this.cellStyle, {font: {bold: true, size: 14}});
+        }
     }
     
+    //Add header and merge cells
     addHeader(name) {
         this.n = 0;
-        this.setText(name, this.row, 1, this.cellStyle);
+        this.list.getRow(this.row).getCell(1).value = name;
+        this.list.getRow(this.row).getCell(1).style = Object.assign({}, this.cellStyle, {font: {bold: true, size: 24}});
+        this.list.mergeCells(`A${this.row}:H${this.row}`);
+
         this.row++;
     }
 
     /**
+     * Add map
      * @param {osuMap} map
      * @param {bf} bg src
      */
     addMap(map, bg) {
-        this.setNumber(++this.n, this.row, 1, this.cellStyle);
-        this.setImage(bg, this.row, 2, this.cellStyle);
-        this.setText(`${map.artist} - ${map.title} [${map.diffName}]`, this.row, 3, this.cellStyle);
-        this.setHyperLink(`https://osu.ppy.sh/b/${map.id}`, this.row, 4, this.cellStyle);
-        this.setText(`${map.length}`, this.row, 5, this.cellStyle),
-        this.setText(`${map.bpm}`, this.row, 6, this.cellStyle);
-        this.setText(`${map.stars.toFixed(2)}*`, this.row, 7, this.cellStyle);
-        this.setText(map.stats.toString(), this.row, 8, this.cellStyle);
+        let i = 0;
+
+        //add Order and style
+        this.list.getRow(this.row).getCell(++i).value = (++this.n);
+        this.list.getRow(this.row).getCell(i).style = Object.assign({}, this.cellStyle, {font: {bold: true, size: 16}});
+        //add BG and style
+        this.setImage(`./${bg}`, this.row - 1, ++i);
+        this.list.getRow(this.row).getCell(i).style = this.cellStyle;
+        //add Title and style
+        this.list.getRow(this.row).getCell(++i).value = `${map.artist} - ${map.title} [${map.diffName}]`;
+        this.list.getRow(this.row).getCell(i).style = Object.assign({}, this.cellStyle, {font: {italic: true, bold: true, size: 14}});
+        //add URL and style
+        this.list.getRow(this.row).getCell(++i).value = `https://osu.ppy.sh/b/${map.id}`;
+        this.list.getRow(this.row).getCell(i).style = this.cellStyle;
+        //add Length and style
+        this.list.getRow(this.row).getCell(++i).value = `${map.length}`;
+        this.list.getRow(this.row).getCell(i).style = this.cellStyle;
+        //add BPM and style
+        this.list.getRow(this.row).getCell(++i).value = `${map.bpm}`;
+        this.list.getRow(this.row).getCell(i).style = this.cellStyle;
+        //add Star rate and style
+        this.list.getRow(this.row).getCell(++i).value = `${map.stars.toFixed(2)}*`;
+        this.list.getRow(this.row).getCell(i).style = this.cellStyle;
+        //add Stats and style
+        this.list.getRow(this.row).getCell(++i).value = map.stats.toString();
+        this.list.getRow(this.row).getCell(i).style = this.cellStyle;
+
         this.row++;
-    }
-
-    // Set cell's text
-    setText(text, row, col, style = {}) {
-        this.list.cell(row, col).string(text).style(style);
-    }
-
-    // Set cell's number
-    setNumber(text, row, col, style = {}) {
-        this.list.cell(row, col).number(text).style(style);
-    }
-
-    // Add hyperlink to a cell
-    setHyperLink(link, row, col, style = {}) {
-        this.list.cell(row, col).link(link).style(style);
     }
 
     // Add image to a cell
     setImage(path, row, col, style = {}) {
-        this.list.addImage({
-            path,
-            type: 'picture',
-            position: {
-                type: 'twoCellAnchor',
-                from: {
-                    col,
-                    colOff: 0,
+            let image = this.book.addImage({
+                buffer: fs.readFileSync(path),
+                extension: 'jpeg',
+            });
+            this.list.addImage(image, {
+                tl: {
                     row,
-                    rowOff: 0
+                    col: col -1
                 },
-                to: {
-                    col: col + 1,
-                    colOff: 0,
+                br: {
                     row: row + 1,
-                    rowOff: 0
-                }
-            }
-        });
-        this.list.cell(row, col).style(style);
+                    col
+                },
+                editAs: 'oneCell'
+            });
+        
     }
 
     // Save map pool to the file
     savePool(file) {
-        this.book.write(file);
+        this.book.xlsx.writeFile(file);
     }
 }
 

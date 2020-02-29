@@ -13,15 +13,15 @@ class osuMap {
         this.mapsetId = Number(data.beatmapset_id);
         this.id = Number(data.beatmap_id);
         this.stats = {
-            ar: Number(this.calculateAR(data.diff_approach)).toFixed(1), //data.diff_approach
-            cs: Number(this.calculateCS(data.diff_size)).toFixed(1), //data.diff_size
-            od: Number(this.calculateOD(data.diff_overall)).toFixed(1), //data.diff_overall
-            hp: Number(this.calculateHP(data.diff_drain)).toFixed(1), //data.diff_drain
+            ar: Number(this.calculateAR(data.diff_approach)).toFixed(1),
+            cs: Number(this.calculateCS(data.diff_size)).toFixed(1),
+            od: Number(this.calculateOD(data.diff_overall)).toFixed(1),
+            hp: Number(this.calculateHP(data.diff_drain)).toFixed(1),
             toString() {
                 return `AR:${this.ar} CS:${this.cs} OD:${this.od} HP:${this.hp}`;
             }
         };
-        this.bpm = Number(data.bpm)
+        this.bpm = Number(this.calculateBPM(data.bpm))
         this.stars = Number(data.difficultyrating);
         this.length = this.calculateLength(data.total_length);
         this.artist = data.artist;
@@ -31,14 +31,26 @@ class osuMap {
     }
 
     calculateLength(length) {
-        let minutes = String(Math.floor(length / 60));
-        let seconds = String(Math.floor(length % 60));
+        let len = length;
+        if (this.mod == 64) { 
+            len = Math.ceil(len / 1.5);
+        }
+        let minutes = String(Math.floor(len / 60));
+        let seconds = String(Math.floor(len % 60));
 
         if (seconds.length != 2) {
             seconds = seconds + '0';
         }
 
         return `${minutes}:${seconds}`;
+    }
+
+    calculateBPM(BPM) {
+        let bpm = BPM;
+        if (this.mod == 64) { 
+            bpm = Math.round(bpm * 1.5);
+        }
+        return bpm;
     }
 
     getBaseModValues() {
