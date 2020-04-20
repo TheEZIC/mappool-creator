@@ -1,27 +1,7 @@
-/*
-[Nomod=0]
-https://osu.ppy.sh/b/143254
-https://osu.ppy.sh/b/143254
-[Hidden=8]
-https://osu.ppy.sh/b/143254
-https://osu.ppy.sh/b/143254
-[Hardrock=16]
-https://osu.ppy.sh/b/143254
-https://osu.ppy.sh/b/143254
-[DoubleTime=64]
-https://osu.ppy.sh/b/143254
-https://osu.ppy.sh/b/143254
-[Freemod=0]
-https://osu.ppy.sh/b/143254
-https://osu.ppy.sh/b/143254
-[Tiebreaker=0]
-https://osu.ppy.sh/b/143254
-https://osu.ppy.sh/b/143254
-*/
-
 var reg = {
     group: /\[(?<name>\D+)=(?<mods>\d+)\]/,
-    link: /https?:\/\/osu\.ppy\.sh\/b\/(?<id>\d+)/
+    link: /https?:\/\/osu\.ppy\.sh\/b\/(?<id>\d+)/,
+    link2: /https?:\/\/osu\.ppy\.sh\/beatmapsets\/(?<beatmapsetid>\d+)#\D+(?<beatmapid>\d+)/
 };
 
 class Parser {
@@ -42,7 +22,11 @@ class Parser {
                 mods: Number(data.groups.mods),
                 maps: []
             });
-        } else if(reg.link.test(line)) {
+        } else if (reg.link2.test(line)) {
+            let data = line.match(reg.link2);
+            this.mappool[this.mappool.length - 1].maps.push(Number(data.groups.beatmapid));
+        }
+        else if (reg.link.test(line)) {
             let data = line.match(reg.link);
             this.mappool[this.mappool.length - 1].maps.push(Number(data.groups.id));
         }

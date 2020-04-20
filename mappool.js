@@ -11,10 +11,13 @@ class MapPool {
         this.row = 2;
         // Map №
         this.n = 0;
+        // Add mode counter for mode group
+        this.modeCounter = 1;
+        // Name of current mode group name 
+        this.currentModeName  = "";
         // Create new excel document with 'Map pool' list
         this.book = new xl.Workbook();
-        this.list = this.book.addWorksheet('Map pool', {properties:{defaultRowHeight: 35}}     /* {'sheetFormat': {'defaultRowHeight': 35}} */);
-        /* this.bookStream = createAndFillWorkbook(); */
+        this.list = this.book.addWorksheet('Map pool', {properties:{defaultRowHeight: 35}});
         this.list.state = 'visible';
         // Medium bordered cell style
         this.cellStyle = {
@@ -38,16 +41,19 @@ class MapPool {
         this.list.columns = [
             {header: '№', width: 6},
             {header: 'Background', width: 20},
+            {header: 'Mode', width: 20},
             {header: 'Title', width: 90},
-            {header: 'Link', width: 37},
-            {header: 'LEN', width: 7},
-            {header: 'BPM', width: 7},
             {header: 'SR', width: 7},
-            {header: 'Stats', width: 30}
+            {header: 'BPM', width: 7},
+            {header: 'LEN', width: 7},
+            {header: 'Stats', width: 30},
+            {header: 'Mapper', width: 20},
+            {header: 'Id', width: 20},
+            {header: 'mapsetId', width: 20},
         ]
 
         //Style for sheet header
-        for(let i = 1; i < 9; i++) {
+        for(let i = 1; i < this.list.columns.length + 1; i++) {
             this.list.getRow(1).getCell(i).style = Object.assign({}, this.cellStyle, {font: {bold: true, size: 14}});
         }
     }
@@ -57,7 +63,7 @@ class MapPool {
         this.n = 0;
         this.list.getRow(this.row).getCell(1).value = name;
         this.list.getRow(this.row).getCell(1).style = Object.assign({}, this.cellStyle, {font: {bold: true, size: 24}});
-        this.list.mergeCells(`A${this.row}:H${this.row}`);
+        this.list.mergeCells(`A${this.row}:K${this.row}`);
 
         this.row++;
     }
@@ -66,8 +72,9 @@ class MapPool {
      * Add map
      * @param {osuMap} map
      * @param {bf} bg src
+     * @param {group} group src
      */
-    addMap(map, bg) {
+    addMap(map, bg, group) {
         let i = 0;
 
         //add Order and style
@@ -76,26 +83,77 @@ class MapPool {
         //add BG and style
         this.setImage(`./${bg}`, this.row - 1, ++i);
         this.list.getRow(this.row).getCell(i).style = this.cellStyle;
+        //add mode count
+        this.list.getRow(this.row).getCell(++i).value = this.addMode(group);
+        this.list.getRow(this.row).getCell(i).style = this.cellStyle;
         //add Title and style
-        this.list.getRow(this.row).getCell(++i).value = `${map.artist} - ${map.title} [${map.diffName}]`;
+        this.list.getRow(this.row).getCell(++i).value = `=HYPERLINK(\"https://osu.ppy.sh/b/${map.id}\" ; \"${map.artist} - ${map.title} [${map.diffName}]\")`;
         this.list.getRow(this.row).getCell(i).style = Object.assign({}, this.cellStyle, {font: {italic: true, bold: true, size: 14}});
         //add URL and style
-        this.list.getRow(this.row).getCell(++i).value = `https://osu.ppy.sh/b/${map.id}`;
-        this.list.getRow(this.row).getCell(i).style = this.cellStyle;
-        //add Length and style
-        this.list.getRow(this.row).getCell(++i).value = `${map.length}`;
+        //this.list.getRow(this.row).getCell(++i).value = `https://osu.ppy.sh/b/${map.id}`;
+        //this.list.getRow(this.row).getCell(i).style = this.cellStyle;
+        //add Star rate and style
+        this.list.getRow(this.row).getCell(++i).value = `${map.stars.toFixed(2)}*`;
         this.list.getRow(this.row).getCell(i).style = this.cellStyle;
         //add BPM and style
         this.list.getRow(this.row).getCell(++i).value = `${map.bpm}`;
         this.list.getRow(this.row).getCell(i).style = this.cellStyle;
-        //add Star rate and style
-        this.list.getRow(this.row).getCell(++i).value = `${map.stars.toFixed(2)}*`;
+        //add Length and style
+        this.list.getRow(this.row).getCell(++i).value = `${map.length}`;
         this.list.getRow(this.row).getCell(i).style = this.cellStyle;
         //add Stats and style
         this.list.getRow(this.row).getCell(++i).value = map.stats.toString();
         this.list.getRow(this.row).getCell(i).style = this.cellStyle;
-
+        //add Mapper and style
+        this.list.getRow(this.row).getCell(++i).value = map.creator;
+        this.list.getRow(this.row).getCell(i).style = this.cellStyle;
+        //add Beatmap ID and style
+        this.list.getRow(this.row).getCell(++i).value = map.id;
+        this.list.getRow(this.row).getCell(i).style = this.cellStyle;
+        //add Beatmap ID and style
+        this.list.getRow(this.row).getCell(++i).value = map.mapsetId;
+        this.list.getRow(this.row).getCell(i).style = this.cellStyle;
         this.row++;
+    }
+
+    addMode(group) {
+        if (group !== this.currentModeName) {
+            this.modeCounter = 1;
+        }
+        this.currentModeName = group;
+
+        let string;
+
+        switch (group) {
+            case "Nomod":
+                string = `NM${this.modeCounter}`;
+                this.modeCounter++;
+                break;
+            case "Hidden":
+                string = `HD${this.modeCounter}`;
+                this.modeCounter++;
+            break;
+            case "Hardrock":
+                string = `HR${this.modeCounter}`;
+                this.modeCounter++;
+            break;
+            case "DoubleTime":
+                string = `DT${this.modeCounter}`;
+                this.modeCounter++;
+            break;
+            case "Freemod":
+                string = `FM${this.modeCounter}`;
+                this.modeCounter++;
+            break;
+            case "Tiebreaker":
+                string = `TB${this.modeCounter}`;
+                this.modeCounter++;
+            break;
+            default:
+                string = 'wrong wrong'
+                break;
+        }
+        return string
     }
 
     // Add image to a cell

@@ -18,7 +18,8 @@ class osuMap {
             od: Number(this.calculateOD(data.diff_overall)).toFixed(1),
             hp: Number(this.calculateHP(data.diff_drain)).toFixed(1),
             toString() {
-                return `AR:${this.ar} CS:${this.cs} OD:${this.od} HP:${this.hp}`;
+                // return `AR:${this.ar} CS:${this.cs} OD:${this.od} HP:${this.hp}`;
+                return `${this.cs} | ${this.ar} | ${this.od} | ${this.hp}`;
             }
         };
         this.bpm = Number(this.calculateBPM(data.bpm))
@@ -26,7 +27,7 @@ class osuMap {
         this.length = this.calculateLength(data.total_length);
         this.artist = data.artist;
         this.title = data.title;
-
+        this.creator = data.creator;
         this.diffName = data.version;
     }
 
