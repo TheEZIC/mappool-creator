@@ -1,4 +1,4 @@
-var reg = {
+const reg = {
     group: /\[(?<name>\D+)=(?<mods>\d+)\]/,
     link: /https?:\/\/osu\.ppy\.sh\/b\/(?<id>\d+)/,
     link2: /https?:\/\/osu\.ppy\.sh\/beatmapsets\/(?<beatmapsetid>\d+)#\D+(?<beatmapid>\d+)/

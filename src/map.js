@@ -31,27 +31,18 @@ class osuMap {
         this.diffName = data.version;
     }
 
-    calculateLength(length) {
-        let len = length;
-        if (this.mod == 64) { 
-            len = Math.ceil(len / 1.5);
-        }
-        let minutes = String(Math.floor(len / 60));
-        let seconds = String(Math.floor(len % 60));
-
-        if (seconds.length != 2) {
-            seconds = seconds + '0';
-        }
+    calculateLength(len) {
+        if (this.mod == 64) len = Number((len / 1.5).toFixed(0));
+        let minutes = Math.floor(len / 60);
+        let seconds = (len - minutes * 60).toString().padEnd(2, '0');
 
         return `${minutes}:${seconds}`;
     }
 
     calculateBPM(BPM) {
-        let bpm = BPM;
-        if (this.mod == 64) { 
-            bpm = Math.round(bpm * 1.5);
-        }
-        return bpm;
+        if (this.mod == 64) BPM = Math.round(BPM * 1.5);
+
+        return BPM;
     }
 
     getBaseModValues() {
@@ -73,7 +64,6 @@ class osuMap {
                 this.multiplier = 1;
                 break;
             default:
-                console.log('bruh');
                 break;
         }
     }
@@ -84,8 +74,8 @@ class osuMap {
         let odms = 80 - Math.ceil(6 * baseOD);
         odms = Math.min(80, Math.max(20, odms));
         odms /= this.speedMul;
-        return (Math.ceil(((80 - odms) / 6)*10)/10);
 
+        return ((80 - odms) / 6).toFixed(2);
     }
 
     calculateAR(AR) {
@@ -98,22 +88,23 @@ class osuMap {
         );
         arms = Math.min(1800, Math.max(450, arms));
         arms /= this.speedMul;
-        return (Math.ceil((
-            arms > 1200 ?
-            (1800 - arms) / 120
+
+        return ((
+            arms > 1200
+            ? (1800 - arms) / 120
             : 5 + (1200 - arms) / 150
-        ) * 10) / 10);
+        )).toFixed(2);
     }
 
     calculateCS(CS) {
         let baseCS = CS;
-        if(this.mod == 16)
-            baseCS *= 1.3;
-        return Math.ceil((Math.min(baseCS, 10) * 10) / 10);
+        if(this.mod == 16) baseCS *= 1.3;
+        
+        return ((Math.min(baseCS, 10) * 10) / 10).toFixed(2);
     }
 
     calculateHP(HP) {
-        return Math.ceil((Math.min(HP * this.multiplier, 10) *10) / 10);
+        return (Math.min(HP * this.multiplier, 10)).toFixed(2);
     }
 
     saveBG(path = './bg.jpg') {

@@ -18,7 +18,6 @@ class osuAPI {
             b: id, 
             mods: mods & 338 
         })}`);
-        //console.log(data[0]);
         return new osuMap(data[0], mods);
     }
 }

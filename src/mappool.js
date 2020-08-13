@@ -1,6 +1,6 @@
 let xl = require('exceljs');
 let osuMap = require('./map');
-const { border } = require('./util');
+const { googleSheet } = require('../util');
 let fs = require('fs');
 
 class MapPool {
@@ -81,17 +81,18 @@ class MapPool {
         this.list.getRow(this.row).getCell(++i).value = (++this.n);
         this.list.getRow(this.row).getCell(i).style = Object.assign({}, this.cellStyle, {font: {bold: true, size: 16}});
         //add BG and style
-        this.setImage(`./${bg}`, this.row - 1, ++i);
+        googleSheet 
+        ? this.list.getRow(this.row).getCell(++i).value = `=IMAGE(\"https://assets.ppy.sh/beatmaps/${map.mapsetId}/covers/cover.jpg\")`
+        : this.setImage(`./${bg}`, this.row - 1, ++i); 
         this.list.getRow(this.row).getCell(i).style = this.cellStyle;
         //add mode count
         this.list.getRow(this.row).getCell(++i).value = this.addMode(group);
         this.list.getRow(this.row).getCell(i).style = this.cellStyle;
         //add Title and style
-        this.list.getRow(this.row).getCell(++i).value = `=HYPERLINK(\"https://osu.ppy.sh/b/${map.id}\" ; \"${map.artist} - ${map.title} [${map.diffName}]\")`;
+        this.list.getRow(this.row).getCell(++i).value = googleSheet 
+        ? `=HYPERLINK(\"https://osu.ppy.sh/b/${map.id}\" ; \"${map.artist} - ${map.title} [${map.diffName}]\")`
+        : `${map.artist} - ${map.title} [${map.diffName}]`;
         this.list.getRow(this.row).getCell(i).style = Object.assign({}, this.cellStyle, {font: {italic: true, bold: true, size: 14}});
-        //add URL and style
-        //this.list.getRow(this.row).getCell(++i).value = `https://osu.ppy.sh/b/${map.id}`;
-        //this.list.getRow(this.row).getCell(i).style = this.cellStyle;
         //add Star rate and style
         this.list.getRow(this.row).getCell(++i).value = `${map.stars.toFixed(2)}*`;
         this.list.getRow(this.row).getCell(i).style = this.cellStyle;
@@ -158,22 +159,21 @@ class MapPool {
 
     // Add image to a cell
     setImage(path, row, col, style = {}) {
-            let image = this.book.addImage({
-                buffer: fs.readFileSync(path),
-                extension: 'jpeg',
-            });
-            this.list.addImage(image, {
-                tl: {
-                    row,
-                    col: col -1
-                },
-                br: {
-                    row: row + 1,
-                    col
-                },
-                editAs: 'oneCell'
-            });
-        
+        let image = this.book.addImage({
+            buffer: fs.readFileSync(path),
+            extension: 'jpeg',
+        });
+        this.list.addImage(image, {
+            tl: {
+                row,
+                col: col -1
+            },
+            br: {
+                row: row + 1,
+                col
+            },
+            editAs: 'oneCell'
+        });
     }
 
     // Save map pool to the file
