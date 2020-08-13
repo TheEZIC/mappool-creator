@@ -1,0 +1,16 @@
+[Nomod=0]
+https://osu.ppy.sh/beatmapsets/949145#osu/1981996
+https://osu.ppy.sh/beatmapsets/346213#osu/764293
+https://osu.ppy.sh/beatmapsets/298795#osu/670501
+https://osu.ppy.sh/beatmapsets/209103#osu/495541
+[Hidden=8]
+https://osu.ppy.sh/beatmapsets/23502#osu/80649
+https://osu.ppy.sh/beatmapsets/586889#osu/1243783
+[Hardrock=16]
+https://osu.ppy.sh/beatmapsets/16792#osu/64589
+https://osu.ppy.sh/beatmapsets/214092#osu/560651
+[DoubleTime=64]
+https://osu.ppy.sh/beatmapsets/41315#osu/130594
+https://osu.ppy.sh/beatmapsets/75779#osu/213942
+[Freemod=0]
+[Tiebreaker=0]

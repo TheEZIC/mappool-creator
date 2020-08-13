@@ -8,8 +8,15 @@ const
 
 class Main {
     constructor() {
+        this.checkDirs();
         let pools = this.readPools();
         this.writePools(pools);
+    }
+
+    checkDirs() {
+        if (!fs.existsSync('maps')) fs.mkdirSync('maps');
+        if (!fs.existsSync('covers')) fs.mkdirSync('covers');
+        if (!fs.existsSync('sheets')) fs.mkdirSync('sheets');
     }
 
     readPools() {
