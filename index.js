@@ -14,13 +14,13 @@ class Main {
     }
 
     checkDirs() {
-        if (!fs.existsSync('maps')) fs.mkdirSync('maps');
-        if (!fs.existsSync('covers')) fs.mkdirSync('covers');
-        if (!fs.existsSync('sheets')) fs.mkdirSync('sheets');
+        if (!fs.existsSync('./maps')) fs.mkdirSync('maps');
+        if (!fs.existsSync('./covers')) fs.mkdirSync('covers');
+        if (!fs.existsSync('./sheets')) fs.mkdirSync('sheets');
     }
 
     readPools() {
-        let files = fs.readdirSync('maps');
+        let files = fs.readdirSync('./maps');
 
         return files.map(file => {
             if (!file.startsWith('maps') && !file.endsWith('.txt')) return null;

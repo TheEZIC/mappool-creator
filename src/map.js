@@ -34,7 +34,7 @@ class osuMap {
     calculateLength(len) {
         if (this.mod == 64) len = Number((len / 1.5).toFixed(0));
         let minutes = Math.floor(len / 60);
-        let seconds = (len - minutes * 60).toString().padEnd(2, '0');
+        let seconds = (len - minutes * 60).toString().padStart(2, '0');
 
         return `${minutes}:${seconds}`;
     }
